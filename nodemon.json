@@ -2,6 +2,7 @@
     "env":{
         "MONGO_USER":"user1",
         "MONGO_PASSWORD": "12345",
-        "MONGO_DB": "folder"
+        "MONGO_FOLDER":"folder",
+        "MONGO_DB": "mongodb://localhost:27017/Proj"
     }
 }
