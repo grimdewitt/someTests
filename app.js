@@ -9,8 +9,6 @@ const graphQlResolvers =require('./graphql/resolvers/index');
 const app= express();
 app.use(bodeParser.json());
 
-
-
 app.use('/graphql', graphqlHttp({
     schema: graphQlSchema,
     rootValue:graphQlResolvers,
