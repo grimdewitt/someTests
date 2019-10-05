@@ -1,0 +1,40 @@
+.events__list-item {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid black;
+  display: flex;
+  justify-content: space-between;
+  h1{
+    margin: 0;
+    font-size: 1.5rem;
+    color: black;
+  }
+  h2{
+    margin: 0;
+    font-size: 1rem;
+    color: darkred;
+  }
+  h3{
+    margin: 0;
+    font-size: 1rem;
+    color: dimgray;
+  }
+  p{
+    margin: 0;
+  }
+  button{
+    //text-decoration: none;
+    border: none;
+    background: transparent;
+    color: black;
+    font: inherit;
+    cursor: pointer;
+    vertical-align: middle;
+    margin: 0;
+    &:hover,
+    &.active{
+        border-bottom: 1px solid black
+    }
+}
+
+}

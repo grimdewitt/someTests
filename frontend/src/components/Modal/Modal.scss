@@ -1,0 +1,47 @@
+.modal {
+  width: 30rem;
+  max-width: 90%;
+  background: white;
+  box-shadow: 0 2px 8px black;
+  position: fixed;
+  top: 20vh;
+  padding: 0rem;
+  margin: 2rem auto;
+  //width: 30rem;
+  left: 20%;
+  z-index: 100;
+}
+
+.modal__header {
+  padding: 1.5rem;
+  background: grey;
+  color: black;
+  h1{
+      margin: 0;
+      font-size: 1rem;
+  }
+}
+
+.modal__content{
+    padding: 1rem;
+}
+
+.modal__actions{
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+    button{
+        //text-decoration: none;
+        border: none;
+        background: transparent;
+        color: black;
+        font: inherit;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 0;
+        &:hover,
+        &.active{
+            border-bottom: 1px solid black
+        }
+    }
+}
