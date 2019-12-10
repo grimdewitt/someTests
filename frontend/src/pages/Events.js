@@ -5,12 +5,27 @@ import Backdrop from "../components/Backdrop/Backdrop";
 import AuthContext from "../context/auth-context";
 import EventList from "../components/Events/EventList/EventList";
 import Spinner from "../components/Spinner/Spinner";
+import GoogleMap from "../components/Googlemap/GoogleMap";
+//const nodemailer = require('nodemailer');
+import nodemailer from "nodemailer";
+//import GoogleMapReact from 'google-map-react';
+//import GoogleMapReact from 'google-map-react'
+
+//const AnyReactComponent = ({ text }) => <div>{ text }</div>;export default class Map extends Component {
+// static defaultProps = {
+//  center: { lat: 40.7446790, lng: -73.9485420 },
+//  zoom: 11
+//}
+//}
+
 class EventsPage extends Component {
   state = {
     creating: false,
     events: [],
     isLoading: false,
-    selectedEvent: null
+    selectedEvent: null,
+    latNew: null,
+    lngNew: null
   };
   isActive = true;
 
@@ -25,6 +40,31 @@ class EventsPage extends Component {
 
   componentDidMount() {
     this.fetchEvents();
+    //this.sendMail();
+  }
+
+  sendMail() {
+    let transport = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      auth: {
+        user: "murray.von74@ethereal.email",
+        pass: "Abm4fUYrevSVvdGjAN"
+      }
+    });
+    const message = {
+      from: 'murray.von74@ethereal.email', // Sender address
+      to: "murray.von74@ethereal.email", // List of recipients
+      subject: "Design Your Model S | Tesla", // Subject line
+      text: "Have the most fun you can in a car. Get your Tesla today!" // Plain text body
+    };
+    transport.sendMail(message, function(err, info) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(info);
+      }
+    });
   }
 
   startCreateEvent = () => {
@@ -34,8 +74,13 @@ class EventsPage extends Component {
     this.setState({ creating: false });
     const title = this.titleEl.current.value;
     const price = +this.priceEl.current.value;
+    const lat = this.state.latNew;
+    const lng = this.state.lngNew;
     const date = this.dateEl.current.value;
     const description = this.descriptionEl.current.value;
+
+    //const event = { title, price,lat,lng, date, description };
+    //console.log(event);
 
     if (
       title.trim().length === 0 ||
@@ -45,27 +90,31 @@ class EventsPage extends Component {
     ) {
       return;
     }
-    const event = { title, price, date, description };
-    console.log(event);
+    //const event = { title, price,lat,lng, date, description };
+    //console.log(event);
 
     const requestBody = {
       query: `
-                    mutation CreateEvent($title:String!,$desc:String!,$price:Float!,$date:String!){
-                        createEvent(eventInput:{title: $title,description: $desc,price: $price,date: $date}){
+                    mutation CreateEvent($title:String!,$desc:String!,$price:Float!,$lat:Float!,$lng:Float!,$date:String!){
+                        createEvent(eventInput:{title: $title,description: $desc,price: $price,lat: $lat,lng: $lng,date: $date}){
                           _id
                           title
                           description
                           date
-                          price                           
+                          price
+                          lat
+                          lng                           
                         }
                     }
                 `,
-                variables:{
-                  title: title,
-                  desc:description,
-                  price:price,
-                  date:date
-                }
+      variables: {
+        title: title,
+        desc: description,
+        price: price,
+        lat: lat,
+        lng: lng,
+        date: date
+      }
     };
 
     const token = this.context.token;
@@ -93,6 +142,8 @@ class EventsPage extends Component {
             description: resData.data.createEvent.description,
             date: resData.data.createEvent.date,
             price: resData.data.createEvent.price,
+            lat: resData.data.createEvent.lat,
+            lng: resData.data.createEvent.lng,
             creator: {
               _id: this.context.userId
             }
@@ -119,6 +170,8 @@ class EventsPage extends Component {
                           description
                           date
                           price
+                          lat
+                          lng
                           creator{
                             _id
                             email
@@ -163,6 +216,7 @@ class EventsPage extends Component {
       return { selectedEvent: selectedEvent };
     });
   };
+
   bookEvent = () => {
     if (!this.context.token) {
       this.setState({ selectedEvent: null });
@@ -178,9 +232,9 @@ class EventsPage extends Component {
                         }
                     }
                 `,
-                variables:{
-                  id: this.state.selectedEvent._id
-                }
+      variables: {
+        id: this.state.selectedEvent._id
+      }
     };
 
     //const token = this.context.token;
@@ -210,6 +264,14 @@ class EventsPage extends Component {
   componentWillUnmount() {
     this.isActive = false;
   }
+  updateData = value => {
+    this.setState({
+      latNew: value.lat,
+      lngNew: value.lng
+    });
+    //console.log(this.state.latNew);
+    //console.log(this.state.lngNew);
+  };
   render() {
     return (
       <React.Fragment>
@@ -224,6 +286,9 @@ class EventsPage extends Component {
             confirmText="Confirm"
           >
             <form>
+              <div className="GoogleMap">
+                <GoogleMap updateData={this.updateData}></GoogleMap>
+              </div>
               <div className="form-control">
                 <label htmlFor="title">Title</label>
                 <input type="text" id="title" ref={this.titleEl}></input>
@@ -232,6 +297,16 @@ class EventsPage extends Component {
                 <label htmlFor="price">Price</label>
                 <input type="number" id="price" ref={this.priceEl}></input>
               </div>
+
+              <div className="form-control">
+                <label htmlFor="lat">lat</label>
+                <p>{this.state.latNew}</p>
+              </div>
+              <div className="form-control">
+                <label htmlFor="lng">lng</label>
+                <p>{this.state.lngNew}</p>
+              </div>
+
               <div className="form-control">
                 <label htmlFor="date">Date</label>
                 <input
@@ -244,7 +319,7 @@ class EventsPage extends Component {
                 <label htmlFor="description">Description</label>
                 <textarea
                   id="description"
-                  rows="4"
+                  rows="3"
                   ref={this.descriptionEl}
                 ></textarea>
               </div>

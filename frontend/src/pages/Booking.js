@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import AuthContext from "../context/auth-context";
 import Spinner from "../components/Spinner/Spinner";
 import BookingList from "../components/Bookings/BookingList/BookingList";
-
+import BookingChart from "../components/Bookings/BookingChart/BookingChart";
+import BookingControl from "../components/Bookings/BookingControl/BookingControl";
 class BookingsPage extends Component {
   state = {
     isLoading: false,
-    bookings: []
+    bookings: [],
+    outputType: "list"
   };
 
   static contextType = AuthContext;
@@ -27,6 +29,9 @@ class BookingsPage extends Component {
                  _id
                  title
                  date
+                 price
+                 lat
+                 lng
                }
               }
             }
@@ -75,9 +80,9 @@ class BookingsPage extends Component {
               }
             }
           `,
-          variables:{
-            id: bookingId
-          }
+      variables: {
+        id: bookingId
+      }
     };
 
     const token = this.context.token;
@@ -97,11 +102,11 @@ class BookingsPage extends Component {
         return res.json();
       })
       .then(resData => {
-        this.setState(prevState=>{
-          const updatedBookings =prevState.bookings.filter(booking=>{
-            return booking._id !==bookingId;
+        this.setState(prevState => {
+          const updatedBookings = prevState.bookings.filter(booking => {
+            return booking._id !== bookingId;
           });
-          return {bookings:updatedBookings, isLoading:false};   
+          return { bookings: updatedBookings, isLoading: false };
         });
       })
       .catch(err => {
@@ -110,19 +115,37 @@ class BookingsPage extends Component {
       });
   };
 
+  outputTypeHandler = outputType => {
+    if (outputType === "list") {
+      this.setState({ outputType: "list" });
+    } else {
+      this.setState({ outputType: "chart" });
+    }
+  };
+
   render() {
-    return (
-      <React.Fragment>
-        {this.state.isLoading ? (
-          <Spinner />
-        ) : (
-          <BookingList
-            bookings={this.state.bookings}
-            onDelete={this.deleteBooking}
+    let content = <Spinner />;
+    if (!this.state.isLoading) {
+      content = (
+        <React.Fragment>
+          <BookingControl
+            activeOutputType={this.state.outputType}
+            onChange={this.outputTypeHandler}
           />
-        )}
-      </React.Fragment>
-    );
+          <div>
+            {this.state.outputType === "list" ? (
+              <BookingList
+                bookings={this.state.bookings}
+                onDelete={this.deleteBooking}
+              />
+            ) : (
+              <BookingChart bookings={this.state.bookings} />
+            )}
+          </div>
+        </React.Fragment>
+      );
+    }
+    return <React.Fragment>{content}</React.Fragment>;
   }
 }
 

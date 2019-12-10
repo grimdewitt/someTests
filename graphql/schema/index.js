@@ -14,6 +14,8 @@ type Event{
     title: String!
     description: String!
     price: Float!
+    lat: Float!
+    lng: Float!
     date: String!
     creator: User!
 }
@@ -29,6 +31,8 @@ input EventInput{
     title: String!
     description: String!
     price: Float!
+    lat: Float!
+    lng: Float!
     date: String!
 }
 

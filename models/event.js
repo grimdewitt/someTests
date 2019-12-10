@@ -15,6 +15,14 @@ const eventSchema = new Schema({
     type: Number,
     required: true
   },
+  lat: {
+    type: Number,
+    required: true
+  },
+  lng: {
+    type: Number,
+    required: true
+  },
   date: {
     type: Date,
     required: true
